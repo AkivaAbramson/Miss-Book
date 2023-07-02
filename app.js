@@ -21,7 +21,7 @@ const options = {
     `,
     data() {
         return {
-            route: 'about',
+            route: 'books',
         }
     },
     components: {

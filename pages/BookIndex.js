@@ -10,6 +10,7 @@ import BookList from '../cmps/BookList.js'
 export default {
     template: `
         <section class="book-index">
+            <BookEdit @save="saveBook" />
             <BookFilter @filter="setFilterBy"/>
             <BookList 
                 v-if="books"
@@ -20,7 +21,6 @@ export default {
                 v-if="selectedBook" 
                 :book="selectedBook" 
                 @close="selectedBook = null"/>
-            <BookEdit @save="saveBook" />
         </section>
     `,
     data() {
@@ -32,7 +32,7 @@ export default {
     },
     methods: {
         removeBook(bookId) {
-            bookService.remove(bookId)    
+            bookService.remove(bookId)
                 .then(() => {
                     const idx = this.books.findIndex(book => book.id === bookId)
                     this.books.splice(idx, 1)
@@ -52,7 +52,12 @@ export default {
     computed: {
         filteredBooks() {
             const regex = new RegExp(this.filterBy.title, 'i')
-            return this.books.filter(book => regex.test(book.title))
+
+            return this.books.filter((book) => {
+                const filterTitle = !this.filterBy.title || regex.test(book.title)
+                const filterPrice = !this.filterBy.price  || (Number(book.listPrice.amount) <= Number(this.filterBy.price))
+                return filterTitle && filterPrice
+            })
         }
     },
     created() {

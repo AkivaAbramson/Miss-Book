@@ -7,5 +7,7 @@
 }
 .book-list ul li {
     padding: 10px;
-    background-color: var(--air-force-blue);
+    background-color: var(--thistle);
+    min-width: 200px;
+    min-height: 200px;
 }

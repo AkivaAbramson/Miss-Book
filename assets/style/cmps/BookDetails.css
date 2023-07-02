@@ -15,3 +15,10 @@
 .book-details img:hover {
     rotate: -10deg;
 }
+
+.cheap{
+    color:green;
+}
+.expensive{
+    color: red;
+}

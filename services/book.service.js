@@ -4,7 +4,7 @@ import { storageService } from './async-storage.service.js'
 const PAGE_SIZE = 5
 const BOOK_KEY = 'bookDB'
 
-var gFilterBy = { title: '',/* minSpeed: 0 */}
+var gFilterBy = { title: '', price:0}
 var gSortBy = { title: 1 }
 var gPageIdx
 
@@ -74,7 +74,7 @@ function getEmptyBook(title = '', listPrice = {amount: null, currencyCode:'EUR',
     description: "placerat nisi sodales suscipit tellus",
     pageCount: 713,
     categories: [ "Computers", "Hack" ],
-    thumbnail: "http://ca.org/books-photos/20.jpg",
+    thumbnail: "http://coding-academy.org/books-photos/20.jpg",
     language: "en"}
 }
 
@@ -85,7 +85,7 @@ function getFilterBy() {
 
 function setFilterBy(filterBy = {}) {
     if (filterBy.title !== undefined) gFilterBy.title = filterBy.title
-    // if (filterBy.minSpeed !== undefined) gFilterBy.minSpeed = filterBy.minSpeed
+    if (filterBy.price !== undefined) gFilterBy.price = filterBy.price
     return gFilterBy
 }
 
