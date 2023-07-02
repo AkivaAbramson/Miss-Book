@@ -4,10 +4,12 @@ import { storageService } from './async-storage.service.js'
 const PAGE_SIZE = 5
 const BOOK_KEY = 'bookDB'
 
-var gFilterBy = { txt: '', minSpeed: 0 }
-var gSortBy = { vendor: 1 }
+var gFilterBy = { title: '',/* minSpeed: 0 */}
+var gSortBy = { title: 1 }
 var gPageIdx
 
+import gBooks from "../books.json" assert {type:'json'}
+// console.log(gBooks)
 _createBooks()
 
 
@@ -64,17 +66,26 @@ function save(book) {
     }
 }
 
-function getEmptyBook(vendor = '', maxSpeed = 0) {
-    return { id: '', vendor, maxSpeed }
+function getEmptyBook(title = '', listPrice = {amount: null, currencyCode:'EUR', isOnSale:false},  subtitle, authors, publishedDate, description, pageCount, categories, thumbnail, language ) {
+    return { id: '', title, listPrice,
+    subtitle: "mi est eros dapibus himenaeos",
+    authors: [ "Barbara Cartland" ],
+    publishedDate: 1999,
+    description: "placerat nisi sodales suscipit tellus",
+    pageCount: 713,
+    categories: [ "Computers", "Hack" ],
+    thumbnail: "http://ca.org/books-photos/20.jpg",
+    language: "en"}
 }
+
 
 function getFilterBy() {
     return { ...gFilterBy }
 }
 
 function setFilterBy(filterBy = {}) {
-    if (filterBy.txt !== undefined) gFilterBy.txt = filterBy.txt
-    if (filterBy.minSpeed !== undefined) gFilterBy.minSpeed = filterBy.minSpeed
+    if (filterBy.title !== undefined) gFilterBy.title = filterBy.title
+    // if (filterBy.minSpeed !== undefined) gFilterBy.minSpeed = filterBy.minSpeed
     return gFilterBy
 }
 
@@ -103,17 +114,21 @@ function getNextBookId(bookId) {
 function _createBooks() {
     let books = utilService.loadFromStorage(BOOK_KEY)
     if (!books || !books.length) {
-        books = []
-        books.push(_createBook('audu', 300))
-        books.push(_createBook('fiak', 120))
-        books.push(_createBook('subali', 100))
-        books.push(_createBook('mitsu', 150))
+        books = gBooks
         utilService.saveToStorage(BOOK_KEY, books)
     }
 }
 
-function _createBook(vendor, maxSpeed = 250) {
-    const book = getEmptyBook(vendor, maxSpeed)
+function _createBook(title, listPrice = {amount: utilService.getRandomIntInclusive(50, 200), currencyCode:'EUR', isOnSale:false},
+subtitle = "mi est eros dapibus himenaeos",
+authors = [ "Barbara Cartland" ],
+publishedDate = 1999,
+description = "placerat nisi sodales suscipit tellus",
+pageCount = 713,
+categories = [ "Computers", "Hack" ],
+thumbnail = "http://ca.org/books-photos/20.jpg",
+language = "en"){
+    const book = getEmptyBook(title, listPrice, subtitle, authors, publishedDate, description, pageCount, categories, thumbnail, language )
     book.id = utilService.makeId()
     return book
 }

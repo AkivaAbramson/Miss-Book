@@ -2,7 +2,7 @@ export default {
     template: `
         <section class="book-filter">
             <input 
-                v-model="filterBy.txt" 
+                v-model="filterBy.title" 
                 @input="onSetFilterBy"
                 type="text" 
                 placeholder="search">
@@ -11,7 +11,7 @@ export default {
     data() {
         return {
             filterBy: {
-                txt: ''
+                title: ''
             }
         }
     },

@@ -5,8 +5,8 @@ export default {
 
         <form @submit.prevent="save" class="book-edit">
             <h2>Add a Book</h2>
-            <input v-model="book.vendor" type="text" placeholder="Enter vendor">
-            <input v-model.number="book.maxSpeed" type="number" >
+            <input v-model="book.title" type="text" placeholder="Enter Title">
+            <input v-model.number="book.listPrice['amount']" type="number" >
             <button>save</button>
         </form>
     `,
