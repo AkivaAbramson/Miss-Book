@@ -22,6 +22,9 @@ export const bookService = {
     getNextBookId,
     getFilterBy,
     setFilterBy,
+    addReview,
+    removeReview,
+    
     // getCarCountBySpeedMap ///////////////
 }
 window.bookService = bookService
@@ -132,3 +135,27 @@ language = "en"){
     book.id = utilService.makeId()
     return book
 }
+
+function addReview(bookId, review) {
+    return get(bookId)
+        .then(book => {
+            if (!book.reviews) {
+                book.reviews = []
+            }
+            book.reviews.push(review)
+            return storageService.put(BOOK_KEY, book)
+        })
+}
+
+function removeReview(reviewToRemove, bookId) {
+    return get(bookId)
+      .then(book => {
+        if (!book.reviews) return
+        book.reviews = book.reviews.filter(rev => rev.fullname === reviewToRemove.fulllname &&
+            rev.review === reviewToRemove.review && 
+            rev.readAt === reviewToRemove.readAt)
+        // console.log(book.reviews)    
+        // console.log(storageService.put(BOOK_KEY, book))    
+        return storageService.put(BOOK_KEY, book)
+      })
+  }
