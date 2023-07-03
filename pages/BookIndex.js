@@ -1,7 +1,5 @@
 import { bookService } from '../services/book.service.js'
-
-import BookDetails from '../cmps/BookDetails.js'
-import BookEdit from '../cmps/BookEdit.js'
+import { showSuccessMsg, showErrorMsg } from '../services/event-bus.service.js'
 
 import BookFilter from '../cmps/BookFilter.js'
 import BookList from '../cmps/BookList.js'
@@ -10,41 +8,33 @@ import BookList from '../cmps/BookList.js'
 export default {
     template: `
         <section class="book-index">
-            <BookEdit @save="saveBook" />
+        <RouterLink to="/book/edit">Add Book</RouterLink>
             <BookFilter @filter="setFilterBy"/>
             <BookList 
                 v-if="books"
                 :books="filteredBooks"
-                @select="selectBook" 
                 @remove="removeBook" /> 
-            <BookDetails 
-                v-if="selectedBook" 
-                :book="selectedBook" 
-                @close="selectedBook = null"/>
         </section>
     `,
     data() {
         return {
-            books: null,
-            selectedBook: null,
-            filterBy: {},
+            books: [],
+            filterBy: {}
         }
     },
     methods: {
         removeBook(bookId) {
-            bookService.remove(bookId)
+            bookService.remove(bookId)    
                 .then(() => {
                     const idx = this.books.findIndex(book => book.id === bookId)
                     this.books.splice(idx, 1)
+                    showSuccessMsg('Book removed')
+                })
+                .catch(err => {
+                    showErrorMsg('Cannot remove book')
                 })
         },
-        selectBook(bookId) {
-            this.selectedBook = this.books.find(book => book.id === bookId)
-        },
-        saveBook(bookToSave) {
-            bookService.save(bookToSave)
-                .then(savedBook => this.books.push(savedBook))
-        },
+      
         setFilterBy(filterBy) {
             this.filterBy = filterBy
         }
@@ -65,8 +55,6 @@ export default {
             .then(books => this.books = books)
     },
     components: {
-        BookDetails,
-        BookEdit,
         BookFilter,
         BookList,
     }

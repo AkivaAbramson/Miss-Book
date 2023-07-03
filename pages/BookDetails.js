@@ -1,7 +1,8 @@
+import { bookService } from "../services/book.service.js"
+
 export default {
-    props: ['book'],
     template: `
-        <section class="book-details">
+        <section class="book-details" v-if="book">
             <h2>{{ book.title }}</h2>
             <h4 :class="priceColor">{{'Price: ' + book.listPrice.amount + ' ' + book.listPrice.currencyCode}}</h4>
             <h3>{{ readType }}</h3>
@@ -9,15 +10,27 @@ export default {
             <h5>{{'Author/s: ' + book.authors }}</h5>
             <h5>{{'Subtitle: ' + book.subtitle }}</h5>
             <h5>{{'Published date: ' + book.publishedDate }}</h5>
-            <!-- <h5>{{ book.data }}</h5> -->
             <img :src=book.thumbnail alt="">
-            <button @click="onClose">close</button>
+            <RouterLink to="/book">Back to List</RouterLink>
         </section>
     `,
+    data() {
+        return {
+            book: null
+        }
+    },
+    created() {
+        const {bookId} = this.$route.params
+        bookService.get(bookId)
+            .then(book => {
+                this.book = book
+            })
+            .catch(err => {
+                alert('Cannot load book')
+                this.$router.push('/book')
+            })
+    },
     methods: {
-        onClose() {
-            this.$emit('close')
-        },
     },
     computed: { 
         readType(){
@@ -36,10 +49,6 @@ export default {
                 expensive: this.book.listPrice.amount > 150
             }
         }
-
-        // imgSrc() {
-        //     return `../assets/img/${this.car.vendor}.png`
-        // }
 
     }
 }
