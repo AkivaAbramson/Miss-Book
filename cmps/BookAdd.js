@@ -61,7 +61,7 @@ export default {
         })
     },
     onSearchBook() {
-      bookService.getBooks(this.searchTerm).then((books) => (this.books = books))
+      bookService.getBooks(this.search).then((books) => (this.books = books))
     },
   },
 }
