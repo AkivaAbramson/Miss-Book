@@ -1,6 +1,7 @@
 import { bookService } from "../services/book.service.js"
 
 import AddReview from '../cmps/AddReview.js'
+import ReviewList from '../cmps/ReviewList.js'
 
 export default {
     template: `
@@ -13,49 +14,59 @@ export default {
             <h5>{{'Subtitle: ' + book.subtitle }}</h5>
             <h5>{{'Published date: ' + book.publishedDate }}</h5>
             <img :src=book.thumbnail alt="">
-            <div v-if="book.reviews">
-                <h4>Reviews:</h4>
-                <ul>
-                    <li v-for="review in book.reviews" :key="review.fullname">
-                    <p>Full Name: {{ review.fullname }},   Rating: {{ review.rating }}/5,   Read At: {{ review.readAt }}</p>
-                    <button @click="onRemoveReview(review, book.id)">X</button>
-          </li>
-        </ul>
-      </div>
-
-            <AddReview :book="book"/>
-            <RouterLink to="/book">Back to List</RouterLink>
+            
+            <ReviewList @remove="removeReview" :reviews="book.reviews"/>
+            <AddReview  @add-review="addReview"   />
+            <RouterLink to="/book">Back to List</RouterLink>|
+            <RouterLink :to="'/book/' + book.nextBookId">Next Book</RouterLink> |
+            <RouterLink :to="'/book/' + book.prevBookId">Prev Book</RouterLink> |
         </section>
     `,
     data() {
         return {
-            book: null
+            book: null,
+            txt: ''
         }
     },
     created() {
-        const {bookId} = this.$route.params
-        bookService.get(bookId)
-            .then(book => {
-                this.book = book
-            })
-            .catch(err => {
-                alert('Cannot load book')
-                this.$router.push('/book')
-            })
+        this.loadBook()
+        // const {bookId} = this.$route.params
+        // bookService.get(bookId)
+        //     .then(book => {
+        //         this.book = book
+        //     })
+        //     .catch(err => {
+        //         alert('Cannot load book')
+        //         this.$router.push('/book')
+        //     })
     },
     methods: {
-        onRemoveReview(reviewToRemove, bookId){
-            console.log(reviewToRemove)
-            console.log(bookId)
-            bookService.removeReview(reviewToRemove, bookId)
-            .then(() => {
-                const idx = this.book.reviews.findIndex((rev) => rev.fullname === reviewToRemove.fulllname &&
-                    rev.review === reviewToRemove.review && 
-                    rev.readAt === reviewToRemove.readAt)
-                    this.book.reviews.splice(idx, 1)
-            })
-            
+        loadBook() {
+            const { bookId } = this.$route.params
+            bookService
+                .get(bookId)
+                .then(book => {
+                    this.book = book
+                })
+                .catch(err => {
+                    alert('Cannot load book')
+                    this.$router.push('/book')
+                })
         },
+        addReview(review) {
+            bookService.addReview(this.book.id, review)
+                .then(book => this.book = book)
+        },
+        removeReview(reviewId) {
+            bookService.removeReview(this.book.id, reviewId)
+                .then(book => this.book = book)
+        },
+    },
+    watch:{
+        bookId() {
+            this.loadBook()
+        },
+
     },
     computed: { 
         readType(){
@@ -74,9 +85,13 @@ export default {
                 expensive: this.book.listPrice.amount > 150
             }
         },
+        bookId() {
+            return this.$route.params.bookId
+        },
         
     },
     components: {
         AddReview,
+        ReviewList,
     }
 }

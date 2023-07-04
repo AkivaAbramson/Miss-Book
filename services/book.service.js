@@ -55,6 +55,19 @@ function query() {
 
 function get(bookId) {
     return storageService.get(BOOK_KEY, bookId)
+        .then(book => _setNextPrevBookId(book))
+}
+
+function _setNextPrevBookId(book) {
+    return storageService.query(BOOK_KEY)
+        .then(books => {
+            const bookIdx = books.findIndex(currBook => currBook.id === book.id)
+            book.nextBookId = books[bookIdx + 1] ? books[bookIdx + 1].id : books[0].id
+            book.prevBookId = books[bookIdx - 1]
+                ? books[bookIdx - 1].id
+                : books[books.length - 1].id
+            return book
+        })
 }
 
 function remove(bookId) {
@@ -139,23 +152,18 @@ language = "en"){
 function addReview(bookId, review) {
     return get(bookId)
         .then(book => {
-            if (!book.reviews) {
-                book.reviews = []
-            }
+            if (!book.reviews) book.reviews = []
+            review.id = utilService.makeId()
             book.reviews.push(review)
-            return storageService.put(BOOK_KEY, book)
+            return save(book)
         })
 }
 
-function removeReview(reviewToRemove, bookId) {
+function removeReview(bookId, reviewId) {
     return get(bookId)
-      .then(book => {
-        if (!book.reviews) return
-        book.reviews = book.reviews.filter(rev => rev.fullname === reviewToRemove.fulllname &&
-            rev.review === reviewToRemove.review && 
-            rev.readAt === reviewToRemove.readAt)
-        // console.log(book.reviews)    
-        // console.log(storageService.put(BOOK_KEY, book))    
-        return storageService.put(BOOK_KEY, book)
-      })
-  }
+        .then(book => {
+            const idx = book.reviews.findIndex(review => review.id === reviewId)
+            book.reviews.splice(idx, 1)
+            return save(book)
+        })
+}
