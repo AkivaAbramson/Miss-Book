@@ -49,7 +49,7 @@ export default {
                     this.book = book
                 })
                 .catch(err => {
-                    alert('Cannot load book')
+                    // alert('Cannot load book')
                     this.$router.push('/book')
                 })
         },

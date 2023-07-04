@@ -3,12 +3,14 @@ import { showSuccessMsg, showErrorMsg } from '../services/event-bus.service.js'
 
 import BookFilter from '../cmps/BookFilter.js'
 import BookList from '../cmps/BookList.js'
+import BookAdd from '../cmps/BookAdd.js'
 
 
 export default {
     template: `
-        <section class="book-index">
-        <RouterLink to="/book/edit">Add Book</RouterLink>
+        <section class="book-index" v-if="books">
+        <!-- <RouterLink to="/book/edit">Add Book</RouterLink> -->
+            <BookAdd></BookAdd>
             <BookFilter @filter="setFilterBy"/>
             <BookList 
                 v-if="books"
@@ -57,5 +59,6 @@ export default {
     components: {
         BookFilter,
         BookList,
+        BookAdd,
     }
 }

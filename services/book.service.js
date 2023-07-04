@@ -12,6 +12,9 @@ import gBooks from "../books.json" assert {type:'json'}
 // console.log(gBooks)
 _createBooks()
 
+const SEARCH_KEY = 'searchDB'
+let gBooksCache = utilService.loadFromStorage(BOOK_KEY) || {}
+
 
 export const bookService = {
     query,
@@ -24,8 +27,10 @@ export const bookService = {
     setFilterBy,
     addReview,
     removeReview,
+    getBooks,
+    addGoogleBook,
     
-    // getCarCountBySpeedMap ///////////////
+    
 }
 window.bookService = bookService
 
@@ -151,19 +156,63 @@ language = "en"){
 
 function addReview(bookId, review) {
     return get(bookId)
-        .then(book => {
+    .then(book => {
             if (!book.reviews) book.reviews = []
             review.id = utilService.makeId()
             book.reviews.push(review)
             return save(book)
         })
-}
-
-function removeReview(bookId, reviewId) {
-    return get(bookId)
+    }
+    
+    function removeReview(bookId, reviewId) {
+        return get(bookId)
         .then(book => {
             const idx = book.reviews.findIndex(review => review.id === reviewId)
             book.reviews.splice(idx, 1)
             return save(book)
         })
+    }
+
+function getBooks(keyword) {
+    if (gBooksCache[keyword]) {
+        console.log('Getting from cache')
+        return Promise.resolve(gBooksCache[keyword])
+    }
+    
+    const url = `https://www.googleapis.com/books/v1/volumes?q=${keyword}`
+    
+    return fetch(url)
+    .then((res) => res.json())
+    .then((res) => {
+        console.log('res', res)
+        const results = res.items.map((item) => _bookData(item, keyword))
+        console.log('results', results)
+        gBooksCache[keyword] = results
+        
+        utilService.saveToStorage(BOOK_KEY, gBooksCache)
+        return results
+    })
 }
+
+
+function addGoogleBook(book) {
+    console.log('Added Google Book')
+    return storageService.post(BOOK_KEY, book)
+}
+
+function _bookData(item) {
+  return {
+    id: item.id,
+    title: item.volumeInfo.title,
+    authors: item.volumeInfo.authors,
+    categories: item.volumeInfo.categories,
+    description: item.volumeInfo.description,
+    language: item.volumeInfo.language,
+    pageCount: item.volumeInfo.pageCount,
+    imgUrl: item.volumeInfo.imageLinks?.thumbnail,
+  }
+}
+
+
+
+
